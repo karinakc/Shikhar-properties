@@ -1,11 +1,23 @@
 const menu=document.querySelector('.menu-toggle');
 const nav=document.querySelector('#navigation');
-function closeMenu(){nav.classList.remove('open');menu.setAttribute('aria-expanded','false');menu.setAttribute('aria-label','Open navigation');}
+const dropdown=document.querySelector('.nav-dropdown');
+const dropdownToggle=document.querySelector('.nav-dropdown-toggle');
+const dropdownLinks=[...document.querySelectorAll('.nav-dropdown-menu a')];
+function closeDropdown(){dropdown.classList.remove('open');dropdownToggle.setAttribute('aria-expanded','false');}
+function closeMenu(){nav.classList.remove('open');menu.setAttribute('aria-expanded','false');menu.setAttribute('aria-label','Open navigation');closeDropdown();}
 menu.addEventListener('click',()=>{const open=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(open));menu.setAttribute('aria-label',open?'Close navigation':'Open navigation');});
 nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&nav.classList.contains('open')){closeMenu();menu.focus();}});
-document.addEventListener('click',e=>{if(!e.target.closest('.header'))closeMenu();});
+dropdownToggle.addEventListener('click',event=>{event.stopPropagation();const open=dropdown.classList.toggle('open');dropdownToggle.setAttribute('aria-expanded',String(open));});
+dropdownToggle.addEventListener('keydown',event=>{if(event.key==='ArrowDown'){event.preventDefault();dropdown.classList.add('open');dropdownToggle.setAttribute('aria-expanded','true');dropdownLinks[0].focus();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(dropdown.classList.contains('open')){closeDropdown();dropdownToggle.focus();}else if(nav.classList.contains('open')){closeMenu();menu.focus();}}});
+document.addEventListener('click',e=>{if(!e.target.closest('.nav-dropdown'))closeDropdown();if(!e.target.closest('.header'))closeMenu();});
 window.matchMedia('(min-width:881px)').addEventListener('change',e=>{if(e.matches)closeMenu();});
+
+const scrollTopButton=document.querySelector('.scroll-top');
+const updateScrollButton=()=>scrollTopButton.classList.toggle('visible',window.scrollY>500);
+window.addEventListener('scroll',updateScrollButton,{passive:true});
+updateScrollButton();
+scrollTopButton.addEventListener('click',()=>window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
 
 const inquiryTabs=[...document.querySelectorAll('[data-inquiry-tab]')];
 const inquiryPanels=[...document.querySelectorAll('[data-inquiry-panel]')];
